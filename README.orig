@@ -1,0 +1,246 @@
+************************************************************
+* Project: DHCPd Configurator
+*  Author: Vee Schade <vschade@mindless.com>
+* Release: December 15, 1999
+* Version: 0.7.0
+************************************************************
+
+ABOUT:
+------
+This application assists with creating and maintaining a /etc/dhcpd.conf
+configuration file for the Internet Software Consortium's DHCP version 2
+distribution.
+
+This program was originally written to fill a specific need of one of my
+clients.  Not all of the current DHCPd specification is supported in
+this release.  See the section ISSUES below to see what is currently
+missing and to what extent existing features are supported.  If more
+interest in support for missing features is evident through friendly
+e-mails and feedback I will add them in subsequent releases.
+
+
+LICENSE:
+--------
+This program is 'free' software as covered by the GNU General Public
+License Version 2.  See the file _COPYING_ for details.  No warranties
+of fitness are made by the author for this program nor is he liable for
+any damages that may occur through the use of this software.  However,
+the author uses this program to administrate the dhcpd servers of his
+clients and believes it to be in good working order to the extent of its
+capabilities.
+
+
+REQUIREMENTS:
+-------------
+An ANSI compliant C compiler is required to build this application.  A
+recent version of 'gcc' is sufficient.
+
+This application uses the 'newt' console windowing toolkit from RedHat.
+Version >= 0.40 was/is used to develop this program.  The latest version
+of this toolkit is available on RedHat's ftp site in RPM format and from
+the author's web site in tar.gz format.
+
+This application uses GNU DBM (gdbm) to store its data.  Version >=
+1.7.6 was/is used to develop this program.  The latest version may
+be obtained from GNU's ftp site.
+
+No other extra libraries are used by this application.
+
+
+INSTALL:
+--------
+The Makefile should require no changes on current Linux systems
+to build correctly, assuming the above requirements are met by
+the target platform.
+
+* Extract the source from the gzipped tarball:
+
+	> gunzip -c dhcp-conf_0.7.0.tar.gz | tar xvf -
+
+* Change directory to the distribution directory:
+
+	> cd dhcp-conf_0.7.0
+
+* Type 'make' to build the program:
+
+	> make
+
+NOTE: you may safely ignore any warnings during compile.
+
+* Install the executable:
+
+	> make install
+
+
+USAGE:
+------
+Execute '/sbin/dhcp-conf' as root to configure your DHCPd server.
+All usage information is contained in the program through on-line
+help available for each screen.  Just select "<Help>" at the bottom
+of the relevant screen to see information on that screen's fields.
+If you have an existing '/etc/dhcpd.conf' file, back-up that file
+in the event something goes wrong.  Not all features are currently
+supported and you *will* lose some configuration if your site
+requires a more advanced configuration than this program currently
+supports.  Reread the ABOUT section above and the ISSUES section
+below if you have any doubts!
+
+
+ISSUES:
+-------
+* Supported features:
+
+	This program supports the creation and maintenance of basic
+DHCPd configuration files containing a global parameters section
+("Common Settings"), upto 20 static hosts declarations ("Fixed-host
+Settings"), and upto 20 subnet ranges for dynamic assignments
+("Subnet Settings").
+
+Common Settings - all global parameters are applied to both static and
+dynamic IP assignments in the current version; currently supported
+global parameters include:
+
+	= Minimum and maximum lease times; defaults to 10 and 120
+	  minutes respectively
+
+	= Domain name specification; is limited to 99 characters in
+	  length
+
+	= Default network-mask
+
+	= Default broadcast address
+
+	= Upto three router addresses
+
+	= Upto three DNS addresses
+
+Fixed-host Settings - currently supported fixed-host parameters
+include:
+
+	= The static host's hostname; upto 25 characters in length
+
+	= The static host's ethernet hardware address
+
+	= The static host's fixed-address IP
+
+Subnet Settings - upto 20 subnet ranges are supported and may be
+applied to subnets in any combination or ratio of ranges to subnet
+from 1:1 to 20:1; currently supported parameters include:
+
+	= The subnet address; all subnets currently receive the
+	  network-mask specified in the global parameters section
+
+	= The start and end IP's of the range
+
+
+* Un-supported features:
+
+** Declarations
+
+General declaration blocks not supported by this program include:
+
+	= 'shared-network' declarations
+
+	= 'group' declarations
+
+Block-level parameters for host and subnet declarations not specified
+in the "Supported features" subsection above are not supported by this
+program.
+
+Token-ring hardware is not supported by this program.
+
+The BOOTP protocol is not supported by this program.
+
+** Statements
+
+Parameters and statements not supported by this program include:
+
+	= 'allow' and 'deny' for any keyword; this program was created
+	  to fill a client's need to easily add and/or remove PC's from
+	  his remote office LANs -- therefore, the advanced features
+	  provided by these statements were/are not required
+
+	= 'filename'; remote booting of clients via the 'allow
+	  booting' directive is not supported so there is no need for
+	  this statement
+
+	= 'next-server'; see 'filename' above
+
+	= 'server-name'; the DHCPd server's information may be added
+	  to the site's DNS
+
+	= 'dynamic-bootp-lease-*'; the BOOTP protocol is not
+	  supported by this program
+
+	= 'get-lease-hostnames'; see 'allow'... above
+
+	= 'use-host-decl-names' and the 'host-name' option; since
+	  'group' declarations are not supported and fixed-hosts are
+	  presumed to have the names given in their declarations, these
+	  statements are meaningless in this program
+
+	= 'server-identifier'; this parameter is neither needed nor
+	  used in the majority of situations
+
+** Options
+
+Any DHCP options not explicity identified in the "Common Settings"
+subsection above are not supported by this program.
+
+
+TODO:
+-----
+This section identifies planned future enhancements for this program.
+The following is presented in no specific order.
+
+* Error messages: when an error is encountered in an input field of a
+  screen, the screen notifies the user with a beep and positions the
+  cursor to that field; however, the user is not told the nature of
+  the error -- a future version will display a short error message at
+  the bottom of the screen explaining the error
+
+* Input assistance: though the network portion of an address may be
+  easily calculated from the global broadcast and network-mask
+  addresses of the global parameters the user must currently enter
+  the full address in an IP input field -- a future version will
+  perform this calculation and automatically insert the network
+  portion of all addresses
+
+* Subnet requirement: the DHCPd specification requires at least one
+  'subnet' declaration in the dhcpd.conf file (dynamic IP ranges
+  need not be specified, though this program requires it -- see the
+  'allow'... subsection above); however, this program does not
+  currently ensure that one is entered -- a future version will
+  check for this and prompt the user to the appropriate screen
+
+* Root user permissions: both the DHCPd server's configuration file
+  (dhcpd.conf) and this program's data file (dhcp-conf.dat) are
+  stored under /etc; as this location's write permissions is limited to
+  the system super-user (er, unless the target site is particularly
+  unsecure for some reason...), this program should be executed as
+  'root' (or with SUID permissions, though this is _not_ recommended);
+  since this is not currently checked for this program will run when
+  executed by a normal user but will be unable to read or write any of
+  its associated configuration and data files (nor is the user notified
+  of these "errors", lending to inaccurate perceptions about the
+  program's performance) -- a future version will check for this and
+  refuse to run for normal users
+
+
+BUGS:
+-----
+Please send any reports of bugs, requests for new features, and/or
+patches <g> in care of the author at the address above.
+
+
+AUTHOR:
+-------
+Vee Schade, known in the "real world" as Tony Cook, is an independent
+consultant and contractor with more than 20 years of experience in
+computer systems of all shapes and sizes.  He specializes in Linux,
+Java, and database systems development.  He may be contacted by e-mail
+at the address above or through his personal home-page at
+http://members.xoom.com/vschade.
+
+
+###---- end of file: README (dhcp-conf) ----###
